@@ -27,29 +27,31 @@
         </Grid.ColumnDefinitions>
 
         <ScrollViewer
-            Name="svResult"
+            Name="svResults"
             Grid.Row="0"
-            Grid.ColumnSpan="4">
-            
-            <TextBlock
-                Name="tbHistory"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Width="Auto"
-                Height="Auto"
-                Padding="5" />
-            
-        </ScrollViewer>
-
-        <TextBlock
-            Name="tbInput"
-            Grid.Row="1"
             Grid.ColumnSpan="4"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Width="Auto"
             Height="Auto"
+            Padding="5">
+
+            <StackPanel
+                Name="spResults" />
+
+        </ScrollViewer>
+
+        <TextBox
+            Name="tbInput"
+            Grid.Row="1"
+            Grid.ColumnSpan="4"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            VerticalContentAlignment="Center"
+            Width="Auto"
+            Height="Auto"
             Padding="5"
+            IsReadOnly="True"
             FontSize="14"
             FontWeight="Bold" />
         
@@ -198,13 +200,15 @@
             Click="bDot_Click" />
 
         <Button
+            Name="bPercent"
             Grid.Row="5"
             Grid.Column="2"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Width="Auto"
             Height="Auto"
-            Content="%" />
+            Content="%"
+            Click="bPercent_Click" />
 
         <Button
             Name="bAdd"

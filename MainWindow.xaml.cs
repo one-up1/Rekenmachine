@@ -45,14 +45,22 @@ namespace Rekenmachine
             string dot = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
             // double.Parse() gaat op zich wel goed als de string begint of eindigt met een punt,
-            // maar als de string uit alleen een punt bestaat gaat het mis,
+            // maar als de string uit alleen een punt of -. bestaat gaat het mis,
             // dus we gaan het makkelijk maken door er dan gewoon een 0 voor te zetten.
             if (tbInput.Text.Length == 0)
                 tbInput.Text = "0";
+            else if (tbInput.Text == "-")
+                tbInput.Text = "-0";
 
             // Maar meerdere punten mag niet...
             if (!tbInput.Text.Contains(dot))
                 tbInput.Text += dot;
+        }
+
+        private void bPercent_Click(object sender, RoutedEventArgs e)
+        {
+            if (tbInput.Text.Length > 0)
+                tbInput.Text = (double.Parse(tbInput.Text) / 100).ToString();
         }
 
         private void bDivide_Click(object sender, RoutedEventArgs e)
@@ -67,7 +75,15 @@ namespace Rekenmachine
 
         private void bSubtract_Click(object sender, RoutedEventArgs e)
         {
-            Calc(Operation.Subtract);
+            // Deze knop kan ook gebruikt worden om negatieve getallen in te voeren.
+            if (tbInput.Text.Length == 0)
+            {
+                tbInput.Text = "-";
+            }
+            else
+            {
+                Calc(Operation.Subtract);
+            }
         }
 
         private void bAdd_Click(object sender, RoutedEventArgs e)
@@ -83,12 +99,15 @@ namespace Rekenmachine
         private void Calc(Operation operation)
         {
             // We gaan alleen rekenen als er iets is ingevuld.
-            if (tbInput.Text.Length > 0)
+            if (tbInput.Text.Length > 0 && tbInput.Text != "-")
             {
+                // Parse de input en maak de TextBox weer leeg.
+                double input = double.Parse(tbInput.Text);
+                tbInput.Text = "";
+
                 // Nu gaan we rekenen op basis van het vorige result en operation, als die er is.
                 // Het gebruiken van "=" (Operation.None) zet het resultaat op de input
                 // en reset de operation voor de volgende keer.
-                double input = double.Parse(tbInput.Text);
                 Console.WriteLine("operation=" + this.operation + ", input=" + input);
                 switch (this.operation)
                 {
@@ -110,17 +129,23 @@ namespace Rekenmachine
                 }
                 Console.WriteLine("result=" + result);
 
-                // Laat het resultaat zien en maak de input weer leeg.
-                if (tbHistory.Text.Length > 0)
-                    tbHistory.Text += Environment.NewLine;
-                tbHistory.Text += result;
-                svResult.ScrollToBottom();
-                tbInput.Text = "";
+                // Laat het resultaat zien in een Label.
+                // Dubbelkikken op een result label zet de input op dat resultaat.
+                Label lResult = new Label();
+                lResult.Content = result;
+                lResult.MouseDoubleClick += Label_MouseDoubleClick; // Label heeft geen Click event? :S
+                spResults.Children.Add(lResult);
+                svResults.ScrollToBottom();
             }
 
             // En bewaar de geselecteerde operation voor de volgende keer.
             this.operation = operation;
             Console.WriteLine("operation=" + operation);
+        }
+
+        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            tbInput.Text = ((Label) sender).Content.ToString();
         }
 
         private enum Operation
