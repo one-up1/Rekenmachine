@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Rekenmachine"
         mc:Ignorable="d"
-        Title="Rekenmachine" Height="400" Width="400" WindowStartupLocation="CenterScreen">
+        Title="Rekenmachine" Height="400" Width="400" WindowStartupLocation="CenterScreen" MinHeight="400" MinWidth="400">
 
     <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="60" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
@@ -25,23 +26,32 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock
-            Name="tbHistory"
+        <ScrollViewer
+            Name="svResult"
             Grid.Row="0"
-            Grid.ColumnSpan="4"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            Width="Auto"
-            Height="Auto" />
+            Grid.ColumnSpan="4">
+            
+            <TextBlock
+                Name="tbHistory"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Width="Auto"
+                Height="Auto"
+                Padding="5" />
+            
+        </ScrollViewer>
 
-        <TextBox
+        <TextBlock
             Name="tbInput"
             Grid.Row="1"
             Grid.ColumnSpan="4"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Width="Auto"
-            Height="Auto" />
+            Height="Auto"
+            Padding="5"
+            FontSize="14"
+            FontWeight="Bold" />
         
         <Button
             Grid.Row="2"
@@ -177,6 +187,7 @@
             Click="Button_Click" />
 
         <Button
+            Name="bDot"
             Grid.Row="5"
             Grid.Column="1"
             HorizontalAlignment="Stretch"
@@ -184,7 +195,7 @@
             Width="Auto"
             Height="Auto"
             Content="."
-            Click="Button_Click" />
+            Click="bDot_Click" />
 
         <Button
             Grid.Row="5"
@@ -193,8 +204,7 @@
             VerticalAlignment="Stretch"
             Width="Auto"
             Height="Auto"
-            Content="%"
-            Click="Button_Click" />
+            Content="%" />
 
         <Button
             Name="bAdd"
@@ -207,5 +217,16 @@
             Content="+"
             Click="bAdd_Click" />
 
-        </Grid>
+        <Button
+            Name="bIs"
+            Grid.Row="6"
+            Grid.ColumnSpan="4"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Width="Auto"
+            Height="Auto"
+            Content="="
+            Click="bIs_Click" />
+
+    </Grid>
 </Window>
