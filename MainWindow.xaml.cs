@@ -29,6 +29,38 @@ namespace Rekenmachine
             InitializeComponent();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            tbInput.Focus();
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Add:
+                case Key.OemPlus:
+                    Calc(Operation.Add);
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                    Calc(Operation.Subtract);
+                    break;
+                case Key.Multiply:
+                    Calc(Operation.Multiply);
+                    break;
+                case Key.Divide:
+                    Calc(Operation.Divide);
+                    break;
+                case Key.Enter:
+                    Calc(Operation.None);
+                    break;
+                default:
+                    return;
+            }
+            e.Handled = true;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             // Het "sender" object is een referentie naar de knop waarop geklikt is,
@@ -42,25 +74,24 @@ namespace Rekenmachine
             // Dit kan blijkbaar verschillen, double.Parse() herkent geen decimalen of geeft zelfs
             // een exception als de decimalen gescheiden zijn door een . en dit volgens de
             // land/regio instellingen oid een , is of andersom.
-            string dot = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-
-            // double.Parse() gaat op zich wel goed als de string begint of eindigt met een punt,
-            // maar als de string uit alleen een punt of -. bestaat gaat het mis,
-            // dus we gaan het makkelijk maken door er dan gewoon een 0 voor te zetten.
-            if (tbInput.Text.Length == 0)
-                tbInput.Text = "0";
-            else if (tbInput.Text == "-")
-                tbInput.Text = "-0";
-
-            // Maar meerdere punten mag niet...
-            if (!tbInput.Text.Contains(dot))
-                tbInput.Text += dot;
+            tbInput.Text += CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
         }
 
         private void bPercent_Click(object sender, RoutedEventArgs e)
         {
             if (tbInput.Text.Length > 0)
-                tbInput.Text = (double.Parse(tbInput.Text) / 100).ToString();
+            {
+                try
+                {
+                    tbInput.Text = (double.Parse(tbInput.Text) / 100).ToString();
+                    tbInput.Background = Brushes.White;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error parsing percentage: " + ex);
+                    tbInput.Background = Brushes.Red;
+                }
+            }
         }
 
         private void bDivide_Click(object sender, RoutedEventArgs e)
@@ -76,14 +107,7 @@ namespace Rekenmachine
         private void bSubtract_Click(object sender, RoutedEventArgs e)
         {
             // Deze knop kan ook gebruikt worden om negatieve getallen in te voeren.
-            if (tbInput.Text.Length == 0)
-            {
-                tbInput.Text = "-";
-            }
-            else
-            {
-                Calc(Operation.Subtract);
-            }
+            Calc(Operation.Subtract);
         }
 
         private void bAdd_Click(object sender, RoutedEventArgs e)
@@ -96,15 +120,31 @@ namespace Rekenmachine
             Calc(Operation.None);
         }
 
+        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            tbInput.Text = ((Label)sender).Content.ToString();
+        }
+
         private void Calc(Operation operation)
         {
             // We gaan alleen rekenen als er iets is ingevuld.
-            if (tbInput.Text.Length > 0 && tbInput.Text != "-")
+            if (tbInput.Text.Length > 0)
             {
-                // Parse de input en maak de TextBox weer leeg.
-                double input = double.Parse(tbInput.Text);
-                tbInput.Text = "";
-
+                // Probeer de input te parsen en maak de TextBox weer leeg als dit lukt.
+                double input;
+                try
+                {
+                    input = double.Parse(tbInput.Text);
+                    tbInput.Background = Brushes.White;
+                    tbInput.Text = "";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error parsing input: " + ex);
+                    tbInput.Background = Brushes.Red;
+                    return;
+                }
+                
                 // Nu gaan we rekenen op basis van het vorige result en operation, als die er is.
                 // Het gebruiken van "=" (Operation.None) zet het resultaat op de input
                 // en reset de operation voor de volgende keer.
@@ -138,14 +178,29 @@ namespace Rekenmachine
                 svResults.ScrollToBottom();
             }
 
+            // Toon de geselecteerde operation.
+            switch (operation)
+            {
+                case Operation.Add:
+                    lOperation.Content = "+";
+                    break;
+                case Operation.Subtract:
+                    lOperation.Content = "-";
+                    break;
+                case Operation.Multiply:
+                    lOperation.Content = "*";
+                    break;
+                case Operation.Divide:
+                    lOperation.Content = "/";
+                    break;
+                default:
+                    lOperation.Content = "";
+                    break;
+            }
+
             // En bewaar de geselecteerde operation voor de volgende keer.
             this.operation = operation;
             Console.WriteLine("operation=" + operation);
-        }
-
-        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            tbInput.Text = ((Label) sender).Content.ToString();
         }
 
         private enum Operation
